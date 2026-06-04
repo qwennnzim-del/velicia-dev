@@ -9,7 +9,7 @@ const PORT = 3000;
 app.use(express.json({ limit: '50mb' }));
 
 const getGeminiModelName = (modelId: string) => {
-    return 'gemini-3.5-flash';
+    return 'gemini-2.5-flash';
 };
 
 app.post('/api/chat', async (req, res) => {
@@ -129,7 +129,7 @@ app.post('/api/tts', async (req, res) => {
         const safeText = cleanText.length > 800 ? cleanText.substring(0, 800) + "..." : cleanText;
 
         const response = await ai.models.generateContent({
-            model: "gemini-3.1-flash-tts-preview",
+            model: "gemini-2.5-flash-preview-tts",
             contents: [{ parts: [{ text: safeText }] }],
             config: {
                 responseModalities: ["AUDIO"],
