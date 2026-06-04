@@ -4,6 +4,7 @@ import { GoogleGenAI, Modality } from '@google/genai';
 import { CONFIG } from './config';
 
 const app = express();
+export const apiRouter = express.Router();
 const PORT = 3000;
 
 app.use(express.json({ limit: '50mb' }));
@@ -12,7 +13,7 @@ const getGeminiModelName = (modelId: string) => {
     return 'gemini-2.5-flash';
 };
 
-app.post('/api/chat', async (req, res) => {
+apiRouter.post('/chat', async (req, res) => {
     try {
         let apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
         if (apiKey) {
@@ -104,7 +105,7 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-app.post('/api/tts', async (req, res) => {
+apiRouter.post('/tts', async (req, res) => {
     try {
         let apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
         if (apiKey) {
@@ -129,7 +130,7 @@ app.post('/api/tts', async (req, res) => {
         const safeText = cleanText.length > 800 ? cleanText.substring(0, 800) + "..." : cleanText;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-preview-tts",
+            model: "gemini-2.5-flash",
             contents: [{ parts: [{ text: safeText }] }],
             config: {
                 responseModalities: ["AUDIO"],
@@ -152,6 +153,8 @@ app.post('/api/tts', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+app.use('/api', apiRouter);
 
 async function startServer() {
     if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
