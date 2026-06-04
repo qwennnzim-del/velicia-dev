@@ -1,8 +1,7 @@
 import express from 'express';
 import path from 'path';
-import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Modality } from '@google/genai';
-import { CONFIG } from './config.js';
+import { CONFIG } from './config';
 
 const app = express();
 const PORT = 3000;
@@ -10,7 +9,7 @@ const PORT = 3000;
 app.use(express.json({ limit: '50mb' }));
 
 const getGeminiModelName = (modelId: string) => {
-    return 'gemini-2.5-flash';
+    return 'gemini-3.5-flash';
 };
 
 app.post('/api/chat', async (req, res) => {
@@ -130,7 +129,7 @@ app.post('/api/tts', async (req, res) => {
         const safeText = cleanText.length > 800 ? cleanText.substring(0, 800) + "..." : cleanText;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-preview-tts",
+            model: "gemini-3.1-flash-tts-preview",
             contents: [{ parts: [{ text: safeText }] }],
             config: {
                 responseModalities: ["AUDIO"],
@@ -155,7 +154,8 @@ app.post('/api/tts', async (req, res) => {
 });
 
 async function startServer() {
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+        const { createServer: createViteServer } = await import('vite');
         const vite = await createViteServer({
             server: { middlewareMode: true },
             appType: 'spa',
@@ -174,4 +174,9 @@ async function startServer() {
     });
 }
 
-startServer();
+// Hanya jalankan server secara mandiri jika tidak di lingkungan Vercel
+if (!process.env.VERCEL) {
+    startServer();
+}
+
+export default app;
