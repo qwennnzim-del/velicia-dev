@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    function existing() {
+      return resource.data;
+    }
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isValidChatSession(data) {
+      return data.keys().hasAll(['id', 'title', 'messages', 'timestamp'])
+        && data.id is string
+        && data.id.size() <= 128
+        && data.title is string
+        && data.title.size() <= 200
+        && data.messages is list
+        && data.messages.size() <= 1000
+        && data.timestamp is number
+        && (
+          !('lastModelId' in data) ||
+          (data.lastModelId is string && data.lastModelId.size() <= 128)
+        );
+    }
+
+    match /users/{userId}/chats/{chatId} {
+      allow list: if isSignedIn() && request.auth.uid == userId && isValidId(userId);
+      allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(chatId);
+      allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(chatId);
+      
+      allow create: if isSignedIn()
+        && request.auth.uid == userId
+        && isValidId(userId)
+        && isValidId(chatId)
+        && isValidChatSession(incoming())
+        && incoming().keys().hasAll(['id', 'title', 'messages', 'timestamp'])
+        && (incoming().keys().size() == 4 || (incoming().keys().size() == 5 && 'lastModelId' in incoming()));
+
+      allow update: if isSignedIn()
+        && request.auth.uid == userId
+        && isValidId(userId)
+        && isValidId(chatId)
+        && isValidChatSession(incoming())
+        && incoming().id == existing().id
+        && (
+           incoming().diff(existing()).affectedKeys().hasOnly(['title', 'messages', 'timestamp', 'lastModelId'])
+        );
+    }
+  }
+}

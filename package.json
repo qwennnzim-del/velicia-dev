@@ -1,0 +1,40 @@
+{
+  "name": "velicia-ai",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "start": "node dist/server.cjs",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "firebase": "^10.8.0",
+    "lucide-react": "^0.454.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.1",
+    "react-router-dom": "^6.27.0",
+    "remark-gfm": "^4.0.0"
+  },
+  "devDependencies": {
+    "@firebase/eslint-plugin-security-rules": "^0.0.2",
+    "@tailwindcss/vite": "^4.2.4",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.19.13",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.27",
+    "esbuild": "^0.28.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.2.1",
+    "tsx": "^4.22.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}

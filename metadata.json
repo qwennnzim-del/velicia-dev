@@ -1,0 +1,10 @@
+{
+  "name": "Remix: Velicia.ai",
+  "description": "A clean, minimalist AI chat assistant featuring a user-friendly interface inspired by modern conversational design.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
